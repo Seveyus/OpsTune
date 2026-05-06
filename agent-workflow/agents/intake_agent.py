@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import re
 
+from langchain_backend import LangChainBackend
+from prompts.intake import INTAKE_PROMPT
 from schemas import IncidentFacts
 
 
@@ -48,7 +50,15 @@ class IntakeAgent:
         ],
     }
 
-    def run(self, incident_report: str, mock_mode: bool = True) -> IncidentFacts:
+    def run(
+        self,
+        incident_report: str,
+        mock_mode: bool = True,
+        llm_backend: LangChainBackend | None = None,
+    ) -> IncidentFacts:
+        if not mock_mode:
+            return self._run_langchain(incident_report=incident_report, llm_backend=llm_backend)
+
         normalized = " ".join(incident_report.strip().split())
         lower_report = normalized.lower()
 
@@ -76,6 +86,19 @@ class IntakeAgent:
             observed_anomalies=anomalies,
             operational_impact=impact,
             extracted_signals=signals,
+        )
+
+    def _run_langchain(
+        self,
+        *,
+        incident_report: str,
+        llm_backend: LangChainBackend | None,
+    ) -> IncidentFacts:
+        backend = llm_backend or LangChainBackend()
+        return backend.invoke_structured(
+            system_prompt=INTAKE_PROMPT,
+            user_payload={"incident_report": incident_report},
+            schema=IncidentFacts,
         )
 
     def _extract_matches(self, text: str, section: str) -> list[str]:

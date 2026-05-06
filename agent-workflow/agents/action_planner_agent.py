@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from schemas import IncidentFacts, RecommendedAction, RootCauseResult, TriageResult
+from langchain_backend import LangChainBackend
+from prompts.action_planner import ACTION_PLANNER_PROMPT
+from schemas import ActionPlanResult, IncidentFacts, RecommendedAction, RootCauseResult, TriageResult
 
 
 class ActionPlannerAgent:
@@ -12,7 +14,16 @@ class ActionPlannerAgent:
         triage: TriageResult,
         root_cause: RootCauseResult,
         mock_mode: bool = True,
+        llm_backend: LangChainBackend | None = None,
     ) -> list[RecommendedAction]:
+        if not mock_mode:
+            return self._run_langchain(
+                facts=facts,
+                triage=triage,
+                root_cause=root_cause,
+                llm_backend=llm_backend,
+            )
+
         actions: list[RecommendedAction] = []
 
         if triage.urgency == "immediate":
@@ -65,3 +76,23 @@ class ActionPlannerAgent:
             )
 
         return actions
+
+    def _run_langchain(
+        self,
+        *,
+        facts: IncidentFacts,
+        triage: TriageResult,
+        root_cause: RootCauseResult,
+        llm_backend: LangChainBackend | None,
+    ) -> list[RecommendedAction]:
+        backend = llm_backend or LangChainBackend()
+        result = backend.invoke_structured(
+            system_prompt=ACTION_PLANNER_PROMPT,
+            user_payload={
+                "facts": facts.model_dump(),
+                "triage": triage.model_dump(),
+                "root_cause": root_cause.model_dump(),
+            },
+            schema=ActionPlanResult,
+        )
+        return result.actions

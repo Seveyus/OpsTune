@@ -1,6 +1,6 @@
 # OpsTune Agent Workflow
 
-This folder contains the V1 agent/workflow layer for OpsTune. It converts a messy industrial incident report into a structured maintenance-oriented JSON response without requiring a live LLM API.
+This folder contains the V1 agent/workflow layer for OpsTune. It converts a messy industrial incident report into a structured maintenance-oriented JSON response and now supports both deterministic and LangChain-backed execution.
 
 ## What it does
 
@@ -12,7 +12,12 @@ The workflow runs five simple steps:
 4. Action planner: recommend operational next steps
 5. Report: assemble the final JSON and human-readable summary
 
-For V1, all steps are implemented with deterministic Python rules and Pydantic schemas. This keeps the workflow easy to test locally and leaves clear integration points for future LangChain or CrewAI work.
+The workflow has two modes:
+
+- `mock_mode=True`: deterministic Python rules and Pydantic schemas for local testing
+- `mock_mode=False`: LangChain structured-output calls backed by an OpenAI chat model
+
+This keeps the workflow easy to test locally while enabling an LLM-backed multi-agent path.
 
 ## File layout
 
@@ -45,6 +50,27 @@ python workflow.py
 ```
 
 This loads the sample incident from `examples/sample_incidents.jsonl` and prints the structured JSON result.
+
+## Run with LangChain
+
+Set your API key and disable mock mode:
+
+```bash
+export OPENAI_API_KEY=your_key_here
+export OPENAI_MODEL=gpt-4o-mini
+python -c "from workflow import run_workflow; print(run_workflow('Pump motor temperature rose, alarm triggered, line stopped.', mock_mode=False))"
+```
+
+## Run with Fireworks
+
+Fireworks exposes an OpenAI-compatible API, so the same LangChain path can use it by changing the base URL, API key, and model name.
+
+```bash
+export FIREWORKS_API_KEY=your_fireworks_key_here
+export OPENAI_API_BASE=https://api.fireworks.ai/inference/v1
+export OPENAI_MODEL=accounts/fireworks/models/llama-v3p1-8b-instruct
+python -c "from workflow import run_workflow; print(run_workflow('Pump motor temperature rose, alarm triggered, line stopped.', mock_mode=False))"
+```
 
 ## Use from Python
 
@@ -91,6 +117,8 @@ pytest
 ## Notes for later integration
 
 - `mock_mode=True` keeps outputs deterministic and API-free for hackathon development.
-- Prompt files under `prompts/` are placeholders for future LLM-backed agents.
+- `mock_mode=False` uses `langchain-openai` structured outputs.
+- For OpenAI, set `OPENAI_API_KEY`.
+- For Fireworks, set `FIREWORKS_API_KEY` and `OPENAI_API_BASE=https://api.fireworks.ai/inference/v1`.
+- Prompt files under `prompts/` define the LangChain agent roles.
 - `workflow.py` exposes `run_workflow(...)` so the backend can import it later.
-- TODO comments mark where LangChain or CrewAI integration can be added.

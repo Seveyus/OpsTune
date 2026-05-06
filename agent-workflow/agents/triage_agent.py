@@ -1,12 +1,22 @@
 from __future__ import annotations
 
+from langchain_backend import LangChainBackend
+from prompts.triage import TRIAGE_PROMPT
 from schemas import IncidentFacts, TriageResult
 
 
 class TriageAgent:
     """Assign severity, category, and urgency using simple deterministic rules."""
 
-    def run(self, facts: IncidentFacts, mock_mode: bool = True) -> TriageResult:
+    def run(
+        self,
+        facts: IncidentFacts,
+        mock_mode: bool = True,
+        llm_backend: LangChainBackend | None = None,
+    ) -> TriageResult:
+        if not mock_mode:
+            return self._run_langchain(facts=facts, llm_backend=llm_backend)
+
         report = facts.normalized_report.lower()
 
         severity = "low"
@@ -53,4 +63,17 @@ class TriageAgent:
             category=category,
             urgency=urgency,
             rationale=rationale,
+        )
+
+    def _run_langchain(
+        self,
+        *,
+        facts: IncidentFacts,
+        llm_backend: LangChainBackend | None,
+    ) -> TriageResult:
+        backend = llm_backend or LangChainBackend()
+        return backend.invoke_structured(
+            system_prompt=TRIAGE_PROMPT,
+            user_payload={"facts": facts.model_dump()},
+            schema=TriageResult,
         )

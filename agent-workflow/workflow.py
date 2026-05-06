@@ -8,28 +8,39 @@ from agents.intake_agent import IntakeAgent
 from agents.report_agent import ReportAgent
 from agents.root_cause_agent import RootCauseAgent
 from agents.triage_agent import TriageAgent
+from langchain_backend import LangChainBackend
 
 
 class OpsTuneWorkflow:
-    """Simple multi-step workflow that can later be backed by real LLM agents."""
+    """Multi-step workflow with deterministic and LangChain-backed execution modes."""
 
-    def __init__(self) -> None:
+    def __init__(self, llm_backend: LangChainBackend | None = None) -> None:
         self.intake_agent = IntakeAgent()
         self.triage_agent = TriageAgent()
         self.root_cause_agent = RootCauseAgent()
         self.action_planner_agent = ActionPlannerAgent()
         self.report_agent = ReportAgent()
+        self.llm_backend = llm_backend
 
     def run(self, incident_report: str, mock_mode: bool = True) -> dict:
-        # TODO: Replace or augment these pure-Python agents with LangChain/CrewAI executors.
-        facts = self.intake_agent.run(incident_report=incident_report, mock_mode=mock_mode)
-        triage = self.triage_agent.run(facts=facts, mock_mode=mock_mode)
-        root_cause = self.root_cause_agent.run(facts=facts, triage=triage, mock_mode=mock_mode)
+        facts = self.intake_agent.run(
+            incident_report=incident_report,
+            mock_mode=mock_mode,
+            llm_backend=self.llm_backend,
+        )
+        triage = self.triage_agent.run(facts=facts, mock_mode=mock_mode, llm_backend=self.llm_backend)
+        root_cause = self.root_cause_agent.run(
+            facts=facts,
+            triage=triage,
+            mock_mode=mock_mode,
+            llm_backend=self.llm_backend,
+        )
         actions = self.action_planner_agent.run(
             facts=facts,
             triage=triage,
             root_cause=root_cause,
             mock_mode=mock_mode,
+            llm_backend=self.llm_backend,
         )
         result = self.report_agent.run(
             facts=facts,
@@ -37,13 +48,18 @@ class OpsTuneWorkflow:
             root_cause=root_cause,
             actions=actions,
             mock_mode=mock_mode,
+            llm_backend=self.llm_backend,
         )
         return result.model_dump()
 
 
-def run_workflow(incident_report: str, mock_mode: bool = True) -> dict:
-    """Public entrypoint for future backend integration."""
-    workflow = OpsTuneWorkflow()
+def run_workflow(
+    incident_report: str,
+    mock_mode: bool = True,
+    llm_backend: LangChainBackend | None = None,
+) -> dict:
+    """Public entrypoint for backend integration."""
+    workflow = OpsTuneWorkflow(llm_backend=llm_backend)
     return workflow.run(incident_report=incident_report, mock_mode=mock_mode)
 
 

@@ -54,6 +54,10 @@ class RecommendedAction(BaseModel):
     reason: str
 
 
+class ActionPlanResult(BaseModel):
+    actions: list[RecommendedAction] = Field(default_factory=list)
+
+
 class WorkflowResult(BaseModel):
     severity: SeverityLevel
     category: IncidentCategory
