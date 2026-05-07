@@ -1,0 +1,20 @@
+{
+  "incident_001": {
+    "severity": "critical",
+    "category": "safety",
+    "likely_root_causes": ["Fire hazard"],
+    "evidence": ["Smoke detected"],
+    "recommended_actions": [{"priority": "immediate", "action": "Evacuate area"}],
+    "confidence": 0.95,
+    "final_report": "Critical safety incident requiring immediate action."
+  },
+  "incident_002": {
+    "severity": "high",
+    "category": "mechanical",
+    "likely_root_causes": ["Bearing wear"],
+    "evidence": ["Increased vibration"],
+    "recommended_actions": [{"priority": "next_shift", "action": "Inspect bearings"}],
+    "confidence": 0.80,
+    "final_report": "Mechanical issue likely due to wear."
+  }
+}
