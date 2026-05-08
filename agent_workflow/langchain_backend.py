@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 from typing import Any, TypeVar
 
@@ -31,6 +32,7 @@ class LangChainBackend:
         schema: type[SchemaT],
     ) -> SchemaT:
         try:
+            from langchain_core.output_parsers import PydanticOutputParser
             from langchain_core.prompts import ChatPromptTemplate
             from langchain_openai import ChatOpenAI
         except ImportError as exc:
@@ -44,10 +46,18 @@ class LangChainBackend:
                 "Missing API key. Set OPENAI_API_KEY for OpenAI or FIREWORKS_API_KEY for Fireworks."
             )
 
+        parser = PydanticOutputParser(pydantic_object=schema)
         prompt = ChatPromptTemplate.from_messages(
             [
-                ("system", system_prompt),
-                ("human", "{input_payload}"),
+                (
+                    "system",
+                    (
+                        f"{system_prompt.strip()}\n\n"
+                        "Return valid JSON only. Do not wrap it in markdown fences.\n"
+                        "{format_instructions}"
+                    ),
+                ),
+                ("human", "{input_payload_json}"),
             ]
         )
         llm = ChatOpenAI(
@@ -56,6 +66,11 @@ class LangChainBackend:
             api_key=self.api_key,
             base_url=self.base_url,
         )
-        chain = prompt | llm.with_structured_output(schema)
+        chain = prompt | llm | parser
 
-        return chain.invoke({"input_payload": user_payload})
+        return chain.invoke(
+            {
+                "input_payload_json": json.dumps(user_payload, ensure_ascii=True, indent=2),
+                "format_instructions": parser.get_format_instructions(),
+            }
+        )
