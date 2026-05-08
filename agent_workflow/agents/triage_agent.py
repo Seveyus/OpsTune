@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from langchain_backend import LangChainBackend
-from prompts.triage import TRIAGE_PROMPT
-from schemas import IncidentFacts, TriageResult
+from ..langchain_backend import LangChainBackend
+from ..prompts.triage import TRIAGE_PROMPT
+from ..schemas import IncidentFacts, TriageResult
 
 
 class TriageAgent:

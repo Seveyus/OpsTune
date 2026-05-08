@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from langchain_backend import LangChainBackend
-from prompts.report import REPORT_PROMPT
-from schemas import IncidentFacts, RecommendedAction, RootCauseResult, TriageResult, WorkflowResult
+from ..langchain_backend import LangChainBackend
+from ..prompts.report import REPORT_PROMPT
+from ..schemas import IncidentFacts, RecommendedAction, RootCauseResult, TriageResult, WorkflowResult
 
 
 class ReportAgent:

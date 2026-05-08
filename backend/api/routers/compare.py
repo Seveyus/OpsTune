@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Body, Depends
 from pydantic import BaseModel
 import json
-# from ...config import config
-from ...dependencies import get_config
+from config import config
+from dependencies import get_config
 
 router = APIRouter(prefix="/compare", tags=["compare"])
 

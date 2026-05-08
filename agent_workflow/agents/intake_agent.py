@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import re
 
-from langchain_backend import LangChainBackend
-from prompts.intake import INTAKE_PROMPT
-from schemas import IncidentFacts
+from ..langchain_backend import LangChainBackend
+from ..prompts.intake import INTAKE_PROMPT
+from ..schemas import IncidentFacts
 
 
 class IntakeAgent:

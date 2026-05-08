@@ -35,7 +35,7 @@ class LangChainBackend:
             from langchain_openai import ChatOpenAI
         except ImportError as exc:
             raise RuntimeError(
-                "LangChain dependencies are not installed. Install agent-workflow/requirements.txt "
+                "LangChain dependencies are not installed. Install agent_workflow/requirements.txt "
                 "and set your model provider API key before running with mock_mode=False."
             ) from exc
 

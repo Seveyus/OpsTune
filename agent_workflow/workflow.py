@@ -3,12 +3,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from agents.action_planner_agent import ActionPlannerAgent
-from agents.intake_agent import IntakeAgent
-from agents.report_agent import ReportAgent
-from agents.root_cause_agent import RootCauseAgent
-from agents.triage_agent import TriageAgent
-from langchain_backend import LangChainBackend
+from .agents.action_planner_agent import ActionPlannerAgent
+from .agents.intake_agent import IntakeAgent
+from .agents.report_agent import ReportAgent
+from .agents.root_cause_agent import RootCauseAgent
+from .agents.triage_agent import TriageAgent
+from .langchain_backend import LangChainBackend
 
 
 class OpsTuneWorkflow:

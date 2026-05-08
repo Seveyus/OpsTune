@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body
 from pydantic import BaseModel
-from ...agent_workflow.workflow import run_workflow  # Import the workflow
-from ...agent_workflow.schemas import IncidentFacts  # Assuming schemas exist
+from agent_workflow.workflow import run_workflow
+from agent_workflow.schemas import IncidentFacts
 
 router = APIRouter(prefix="/analyze", tags=["analyze"])
 

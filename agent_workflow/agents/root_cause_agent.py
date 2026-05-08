@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from langchain_backend import LangChainBackend
-from prompts.root_cause import ROOT_CAUSE_PROMPT
-from schemas import IncidentFacts, RootCauseHypothesis, RootCauseResult, TriageResult
+from ..langchain_backend import LangChainBackend
+from ..prompts.root_cause import ROOT_CAUSE_PROMPT
+from ..schemas import IncidentFacts, RootCauseHypothesis, RootCauseResult, TriageResult
 
 
 class RootCauseAgent:
