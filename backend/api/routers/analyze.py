@@ -16,7 +16,7 @@ class AnalyzeResponse(BaseModel):
     category: str
     likely_root_causes: list[str]
     evidence: list[str]
-    recommended_actions: list[dict]  # Simplified; use RecommendedAction if defined
+    recommended_actions: list[str]  # Simplified; use RecommendedAction if defined
     confidence: float
     final_report: str
 
