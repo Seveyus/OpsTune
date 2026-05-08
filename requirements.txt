@@ -1,2 +1,4 @@
 fastapi==0.136.1
 pydantic
+langchain-core
+langchain-openai

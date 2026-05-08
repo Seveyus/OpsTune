@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Body
 from pydantic import BaseModel
+
 from agent_workflow.workflow import run_workflow
-from agent_workflow.schemas import IncidentFacts
+from agent_workflow.langchain_backend import LangChainBackend
 
 router = APIRouter(prefix="/analyze", tags=["analyze"])
 
@@ -9,6 +10,7 @@ router = APIRouter(prefix="/analyze", tags=["analyze"])
 class AnalyzeRequest(BaseModel):
     incident_report: str
     mock_mode: bool = True
+    use_llm: bool = False
 
 
 class AnalyzeResponse(BaseModel):
@@ -16,23 +18,22 @@ class AnalyzeResponse(BaseModel):
     category: str
     likely_root_causes: list[str]
     evidence: list[str]
-    recommended_actions: list[str]  # Simplified; use RecommendedAction if defined
+    recommended_actions: list[str]
     confidence: float
     final_report: str
 
 
 @router.post("/", response_model=AnalyzeResponse)
 async def analyze_incident(request: AnalyzeRequest = Body(...)):
-    # Run the workflow with the provided incident report
-    result = run_workflow(request.incident_report, mock_mode=request.mock_mode)
+    llm_backend = None
 
-    # Map to response schema (assuming workflow returns a dict matching this)
-    return AnalyzeResponse(
-        severity=result["severity"],
-        category=result["category"],
-        likely_root_causes=result["likely_root_causes"],
-        evidence=result["evidence"],
-        recommended_actions=result["recommended_actions"],
-        confidence=result["confidence"],
-        final_report=result["final_report"]
+    if request.use_llm and not request.mock_mode:
+        llm_backend = LangChainBackend()
+
+    result = run_workflow(
+        incident_report=request.incident_report,
+        mock_mode=request.mock_mode,
+        llm_backend=llm_backend
     )
+
+    return AnalyzeResponse(**result)
