@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body, Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 import json
 from pathlib import Path
 
@@ -15,6 +15,8 @@ class CompareRequest(BaseModel):
 
 
 class CompareResponse(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     match_score: float
     differences: dict
     tuned_result: dict

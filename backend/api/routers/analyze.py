@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from agent_workflow.workflow import run_workflow
 from agent_workflow.langchain_backend import LangChainBackend
@@ -14,6 +14,8 @@ class AnalyzeRequest(BaseModel):
 
 
 class AnalyzeResponse(BaseModel):
+    model_config = ConfigDict(frozen=True)
+
     severity: str
     category: str
     likely_root_causes: list[str]
