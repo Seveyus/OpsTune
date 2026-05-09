@@ -1,0 +1,99 @@
+{
+  "run_name": "baseline",
+  "model": "llama-3.1-8b-instant",
+  "n_test": 73,
+  "aggregate": {
+    "n": 73,
+    "json_valid_rate": 1.0,
+    "schema_ok_rate": 0.9863013698630136,
+    "severity_accuracy": 0.547945205479452,
+    "severity_mean_dist": 0.5205479452054794,
+    "category_accuracy": 0.4520547945205479,
+    "confidence_mae": 0.2561643835616439,
+    "causes_jaccard_mean": 0.019023434851484375,
+    "actions_jaccard_mean": 0.04446135440871604
+  },
+  "by_mode": [
+    {
+      "primary_mode": "HDF",
+      "n": 17,
+      "json_valid": 1.0,
+      "schema_ok": 0.941,
+      "severity_acc": 0.471,
+      "category_acc": 0.118,
+      "conf_mae": 0.303,
+      "causes_jaccard": 0.021,
+      "actions_jaccard": 0.066
+    },
+    {
+      "primary_mode": "HEALTHY",
+      "n": 22,
+      "json_valid": 1.0,
+      "schema_ok": 1.0,
+      "severity_acc": 1.0,
+      "category_acc": 0.682,
+      "conf_mae": 0.265,
+      "causes_jaccard": 0.0,
+      "actions_jaccard": 0.0
+    },
+    {
+      "primary_mode": "OSF",
+      "n": 12,
+      "json_valid": 1.0,
+      "schema_ok": 1.0,
+      "severity_acc": 0.083,
+      "category_acc": 0.833,
+      "conf_mae": 0.213,
+      "causes_jaccard": 0.058,
+      "actions_jaccard": 0.068
+    },
+    {
+      "primary_mode": "PWF",
+      "n": 14,
+      "json_valid": 1.0,
+      "schema_ok": 1.0,
+      "severity_acc": 0.429,
+      "category_acc": 0.0,
+      "conf_mae": 0.269,
+      "causes_jaccard": 0.021,
+      "actions_jaccard": 0.053
+    },
+    {
+      "primary_mode": "RNF",
+      "n": 2,
+      "json_valid": 1.0,
+      "schema_ok": 1.0,
+      "severity_acc": 0.0,
+      "category_acc": 0.0,
+      "conf_mae": 0.35,
+      "causes_jaccard": 0.0,
+      "actions_jaccard": 0.061
+    },
+    {
+      "primary_mode": "TWF",
+      "n": 6,
+      "json_valid": 1.0,
+      "schema_ok": 1.0,
+      "severity_acc": 0.5,
+      "category_acc": 1.0,
+      "conf_mae": 0.113,
+      "causes_jaccard": 0.007,
+      "actions_jaccard": 0.075
+    }
+  ],
+  "predicted_severity_distribution": {
+    "high": 25,
+    "medium": 24,
+    "critical": 2,
+    "low": 22
+  },
+  "predicted_category_distribution": {
+    "mechanical": 44,
+    "unknown": 15,
+    "thermal": 4,
+    "quality": 1,
+    "process": 7,
+    "mechanical|thermal|safety": 1,
+    "sensor": 1
+  }
+}

@@ -1,0 +1,35 @@
+# Fine-tuning + serving deps for OpsTune.
+#
+# IMPORTANT — torch installation is platform-specific. Install torch FIRST,
+# from the right index for your accelerator, then install the rest from PyPI.
+#
+# AMD MI300X / ROCm 6.x  (the project's primary target):
+#     pip install --pre torch --index-url https://download.pytorch.org/whl/rocm6.2
+#
+# NVIDIA CUDA (fallback for dev / Modal / RunPod):
+#     pip install torch --index-url https://download.pytorch.org/whl/cu121
+#
+# Then:
+#     pip install -r finetuning/training/requirements.txt
+#
+# (We deliberately do NOT pin torch here — pip resolves the matching wheel
+# for whichever accelerator index you used above.)
+
+transformers>=4.45.0
+peft>=0.13.0
+trl>=0.11.0
+accelerate>=1.0.0
+datasets>=3.0.0
+sentencepiece>=0.2.0
+protobuf>=4.25.0
+huggingface-hub>=0.26.0
+
+# Tokenizer/JSON helpers
+tiktoken>=0.8.0
+jinja2>=3.1.0
+
+# Serving
+# vLLM ROCm wheel is published separately; on AMD images use the AMD-provided
+# build per https://docs.vllm.ai/en/latest/getting_started/amd-installation.html
+# On NVIDIA, this PyPI wheel works directly.
+vllm>=0.6.3 ; platform_system == "Linux"

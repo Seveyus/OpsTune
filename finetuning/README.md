@@ -1,7 +1,21 @@
-# OpsTune fine-tuning dataset
+# OpsTune fine-tuning
 
-Builds the labeled `(sensors → structured WorkflowResult JSON)` dataset that the
-fine-tuning pipeline will consume. Sourced from `ai4i2020.csv` at the repo root.
+End-to-end pipeline: AI4I sensor rows → deterministic labels → synthetic
+operator narratives → train/val/test splits → baseline + fine-tuned eval →
+LoRA training on Llama 3.1 8B Instruct → vLLM serving.
+
+| Stage | Where | Status |
+|---|---|---|
+| 1 — Labels + structured outputs | `build_dataset.py` (this dir) | ✓ |
+| 2 — Operator narratives | `generate_reports.py` (this dir) | ✓ |
+| 3 — Train/val/test split | `split_dataset.py` (this dir) | ✓ |
+| 4 — Baseline eval | `eval/baseline_eval.ipynb` | ✓ |
+| 5 — LoRA fine-tuning | `training/` (runs on AMD MI300X) | scripts ready |
+| 6 — Fine-tuned eval + comparison | `eval/baseline_eval.ipynb` (re-run) + `training/compare_runs.py` | scripts ready |
+| 7 — vLLM serving | `training/serve_vllm.sh` | scripts ready |
+
+Stages 5-7 run on the GPU box (AMD Developer Cloud MI300X). See
+[`training/README.md`](training/README.md) for the full GPU-side runbook.
 
 ## Files
 

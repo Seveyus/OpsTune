@@ -2,3 +2,13 @@ __pycache__/
 *.pyc
 .venv/
 .idea
+
+# Fine-tuning training artifacts (model checkpoints, GBs — generated on the GPU box)
+finetuning/training/runs/
+.cache/
+hf_cache/
+.ipynb_checkpoints/
+
+# Eval prediction caches are tracked (small, useful for demo / diffing)
+# but ignore stray ones starting with 'tmp'
+finetuning/eval/predictions/tmp*.jsonl
