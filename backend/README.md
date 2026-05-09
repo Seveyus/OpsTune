@@ -142,5 +142,6 @@ pytest
 - The API uses mock data for V1 to keep it deterministic and easy to test.
 - Schemas in `api/schemas/` are defined with Pydantic for validation.
 - Workflow integration pulls from `agent-workflow` via `run_workflow`.
+- Frontend team member @Fashzd added a small backend CORS update in `main.py` so the static frontend demo can call `POST /analyze/` from the browser. This fixes local browser preflight requests (`OPTIONS /analyze/`) that were returning 405 when `frontend/index.html` was opened directly from `file://`.
 - TODO: Add authentication, database integration, and expand services for production use.
 - For full project README, see the root `README.md`.

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpsTune Demo</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --panel: #fff;
+      --ink: #17202a;
+      --muted: #627080;
+      --line: #dbe2ea;
+      --accent: #0f766e;
+      --danger: #b42318;
+      --warn: #b45309;
+      --ok: #15803d;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); }
+    main { width: min(1120px, calc(100vw - 32px)); margin: 0 auto; padding: 28px 0 40px; }
+    header { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 32px; letter-spacing: 0; }
+    header p, .hint, .source { color: var(--muted); font-size: 13px; }
+    header p { margin-top: 6px; font-size: 15px; }
+    .status { border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); padding: 8px 12px; white-space: nowrap; }
+    .grid { display: grid; grid-template-columns: minmax(320px, .9fr) minmax(360px, 1.1fr); gap: 18px; align-items: start; }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; box-shadow: 0 10px 30px rgba(23, 32, 42, .06); }
+    .samples { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    button { border: 0; border-radius: 8px; font: inherit; cursor: pointer; }
+    .sample { background: #eef4f8; color: #273545; padding: 7px 10px; font-size: 13px; }
+    .sample:hover, .sample:focus-visible { outline: 2px solid #bfd1de; }
+    label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; }
+    textarea { width: 100%; min-height: 300px; resize: vertical; border: 1px solid var(--line); border-radius: 8px; padding: 14px; background: #fbfcfd; color: var(--ink); font: 15px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    textarea:focus { outline: 3px solid rgba(15, 118, 110, .18); border-color: var(--accent); }
+    .actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+    .analyze { min-width: 132px; background: var(--accent); color: white; padding: 11px 18px; font-weight: 750; }
+    .analyze:disabled { cursor: wait; opacity: .7; }
+    .result-top { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 16px; }
+    .source { text-align: right; }
+    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
+    .metric { border: 1px solid var(--line); border-radius: 8px; padding: 11px; background: #fbfcfd; min-width: 0; }
+    .metric span, .section h3 { display: block; color: var(--muted); font-size: 12px; margin-bottom: 5px; text-transform: uppercase; }
+    .metric strong { display: block; overflow-wrap: anywhere; font-size: 18px; text-transform: capitalize; }
+    .severity-critical, .severity-high { color: var(--danger); }
+    .severity-medium { color: var(--warn); }
+    .severity-low { color: var(--ok); }
+    .report { border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0; background: #eefaf8; padding: 12px 14px; line-height: 1.55; margin-bottom: 16px; }
+    .sections { display: grid; gap: 14px; }
+    ul { margin: 0; padding-left: 20px; }
+    li { margin: 6px 0; line-height: 1.45; }
+    .empty { display: grid; place-items: center; min-height: 420px; border: 1px dashed var(--line); border-radius: 8px; background: #fbfcfd; color: var(--muted); text-align: center; padding: 28px; }
+    .error { color: var(--danger); }
+
+    @media (max-width: 820px) {
+      main { width: min(100vw - 24px, 680px); padding-top: 18px; }
+      header, .actions, .result-top { align-items: stretch; flex-direction: column; }
+      .grid, .metrics { grid-template-columns: 1fr; }
+      textarea { min-height: 240px; }
+      .source { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>OpsTune Incident Analysis</h1>
+        <p>Paste an incident report, run analysis, and review the structured output.</p>
+      </div>
+      <div class="status" id="status">Ready</div>
+    </header>
+
+    <div class="grid">
+      <section class="panel" aria-label="Incident input">
+        <div class="samples" id="samples"></div>
+        <label for="incident">Incident report</label>
+        <textarea id="incident" spellcheck="true"></textarea>
+        <div class="actions">
+          <button class="analyze" id="analyze" type="button">Analyze</button>
+          <span class="hint">POST /analyze/</span>
+        </div>
+      </section>
+
+      <section class="panel" aria-live="polite">
+        <div class="result-top">
+          <h2>Analysis Result</h2>
+          <span class="source" id="source">Awaiting analysis</span>
+        </div>
+        <div id="result" class="empty">Select a sample or paste an incident report.</div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    const samples = [
+      ["Pump vibration", "Operator reported heavy vibration from pump P-204. Bearing housing is hot to the touch, vibration alarm triggered twice, and the line was stopped for inspection."],
+      ["Sensor fault", "Packaging line shows intermittent pressure sensor fault code P-17. Manual gauge readings look normal, but the PLC keeps tripping the alarm during startup."],
+      ["Motor current", "Conveyor motor current climbed above normal during the last shift. Operators noticed a burning smell near the drive cabinet and reduced throughput to avoid downtime."],
+      ["Hydraulic leak", "Maintenance found hydraulic oil leaking beneath press unit 3. Pressure dropped slowly over two hours and the cycle time became inconsistent before production paused."],
+      ["Quality drift", "Inspection reported increased scrap from the finishing cell. No alarms were active, but parts show inconsistent surface marks after the spindle replacement."]
+    ];
+
+    const fallback = {
+      severity: "high",
+      category: "mechanical",
+      confidence: 0.82,
+      final_report: "OpsTune classified this incident as high severity in the mechanical category. The report points to abnormal vibration and heat around the pump assembly, with immediate inspection recommended before restart.",
+      root_causes: ["Bearing wear or mechanical misalignment", "Insufficient lubrication or cooling constraint"],
+      evidence: ["Heavy vibration reported on pump P-204", "Bearing housing described as hot", "Vibration alarm triggered twice", "Line was stopped for inspection"],
+      recommended_actions: ["Keep the asset stopped until maintenance confirms safe operating state.", "Inspect bearings, alignment, and lubrication condition.", "Log vibration and temperature readings for trend review."]
+    };
+
+    const incident = document.querySelector("#incident");
+    const analyze = document.querySelector("#analyze");
+    const result = document.querySelector("#result");
+    const source = document.querySelector("#source");
+    const status = document.querySelector("#status");
+    const sampleArea = document.querySelector("#samples");
+
+    function apiUrl() {
+      return window.location.protocol === "file:" ? "http://127.0.0.1:8000/analyze/" : "/analyze/";
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function list(value) {
+      return Array.isArray(value) ? value.map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object") return item.action || item.cause || JSON.stringify(item);
+        return String(item);
+      }) : [];
+    }
+
+    function normalize(data) {
+      return {
+        severity: data.severity || "unknown",
+        category: data.category || "unknown",
+        confidence: typeof data.confidence === "number" ? data.confidence : 0,
+        final_report: data.final_report || "No final report returned.",
+        root_causes: list(data.root_causes || data.likely_root_causes),
+        evidence: list(data.evidence),
+        recommended_actions: list(data.recommended_actions)
+      };
+    }
+
+    function renderList(items) {
+      return items.length
+        ? `<ul>${items.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+        : `<p class="hint">No items returned.</p>`;
+    }
+
+    function render(data, label) {
+      const output = normalize(data);
+      result.className = "";
+      source.textContent = label;
+      result.innerHTML = `
+        <div class="metrics">
+          <div class="metric"><span>Severity</span><strong class="severity-${escapeHtml(output.severity).toLowerCase()}">${escapeHtml(output.severity)}</strong></div>
+          <div class="metric"><span>Category</span><strong>${escapeHtml(output.category)}</strong></div>
+          <div class="metric"><span>Confidence</span><strong>${Math.round(output.confidence * 100)}%</strong></div>
+        </div>
+        <p class="report">${escapeHtml(output.final_report)}</p>
+        <div class="sections">
+          <div class="section"><h3>Root Causes</h3>${renderList(output.root_causes)}</div>
+          <div class="section"><h3>Evidence</h3>${renderList(output.evidence)}</div>
+          <div class="section"><h3>Recommended Actions</h3>${renderList(output.recommended_actions)}</div>
+        </div>
+      `;
+    }
+
+    async function runAnalysis() {
+      const incident_report = incident.value.trim();
+      if (!incident_report) {
+        result.className = "empty error";
+        result.textContent = "Enter an incident report before running analysis.";
+        return;
+      }
+
+      analyze.disabled = true;
+      analyze.textContent = "Analyzing...";
+      source.textContent = "Calling API";
+      status.textContent = "Analyzing";
+
+      try {
+        const response = await fetch(apiUrl(), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ incident_report, mock_mode: true })
+        });
+        if (!response.ok) throw new Error(`API returned ${response.status}`);
+        render(await response.json(), "Live API response");
+        status.textContent = "API connected";
+      } catch {
+        render(fallback, "Fallback demo mode");
+        status.textContent = "Fallback mode";
+      } finally {
+        analyze.disabled = false;
+        analyze.textContent = "Analyze";
+      }
+    }
+
+    samples.forEach(([label, text]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "sample";
+      button.textContent = label;
+      button.addEventListener("click", () => {
+        incident.value = text;
+        incident.focus();
+      });
+      sampleArea.appendChild(button);
+    });
+
+    incident.value = samples[0][1];
+    analyze.addEventListener("click", runAnalysis);
+  </script>
+</body>
+</html>

@@ -1,9 +1,17 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from api.routers.analyze import router as analyze_router
 from api.routers.compare import router as compare_router
 from api.routers.health import router as health_router
 
 app = FastAPI(title="OpsTune Backend API", version='0.0.1')
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(analyze_router)
 app.include_router(compare_router)
