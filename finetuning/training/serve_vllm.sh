@@ -22,8 +22,10 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-RUN_NAME="${OPSTUNE_RUN_NAME:-opstune-llama31-8b-lora-v1}"
-BASE_MODEL="${OPSTUNE_BASE_MODEL:-meta-llama/Llama-3.1-8B-Instruct}"
+source "${ROOT}/.venv/bin/activate"
+[[ -f "${ROOT}/.env" ]] && set -a && source "${ROOT}/.env" && set +a
+RUN_NAME="${OPSTUNE_RUN_NAME:-opstune-qwen25-3b-lora-v1}"
+BASE_MODEL="${OPSTUNE_BASE_MODEL:-Qwen/Qwen2.5-3B-Instruct}"
 RUN_DIR="${ROOT}/finetuning/training/runs/${RUN_NAME}"
 ADAPTER_DIR="${RUN_DIR}/adapter"
 MERGED_DIR="${RUN_DIR}/merged"
@@ -63,6 +65,10 @@ else
     --model "$BASE_MODEL" \
     --served-model-name opstune \
     --dtype bfloat16 \
+    --gpu-memory-utilization 0.6 \
+    --max-model-len 2048 \
+    --max-num-seqs 32 \
+    --enforce-eager \
     --enable-lora \
     --lora-modules "opstune=$ADAPTER_DIR" \
     --max-loras 1 \

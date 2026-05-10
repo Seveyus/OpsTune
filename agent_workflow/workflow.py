@@ -8,13 +8,13 @@ from .agents.intake_agent import IntakeAgent
 from .agents.report_agent import ReportAgent
 from .agents.root_cause_agent import RootCauseAgent
 from .agents.triage_agent import TriageAgent
-from .langchain_backend import LangChainBackend
+from .hf_backend import HuggingFaceBackend
 
 
 class OpsTuneWorkflow:
-    """Multi-step workflow with deterministic and LangChain-backed execution modes."""
+    """Multi-step workflow with deterministic and HuggingFace-backed execution modes."""
 
-    def __init__(self, llm_backend: LangChainBackend | None = None) -> None:
+    def __init__(self, llm_backend: HuggingFaceBackend | None = None) -> None:
         self.intake_agent = IntakeAgent()
         self.triage_agent = TriageAgent()
         self.root_cause_agent = RootCauseAgent()
@@ -56,7 +56,7 @@ class OpsTuneWorkflow:
 def run_workflow(
     incident_report: str,
     mock_mode: bool = True,
-    llm_backend: LangChainBackend | None = None,
+    llm_backend: HuggingFaceBackend | None = None,
 ) -> dict:
     """Public entrypoint for backend integration."""
     workflow = OpsTuneWorkflow(llm_backend=llm_backend)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..langchain_backend import LangChainBackend
+from ..hf_backend import HuggingFaceBackend
 from ..prompts.action_planner import ACTION_PLANNER_PROMPT
 from ..schemas import ActionPlanResult, IncidentFacts, RecommendedAction, RootCauseResult, TriageResult
 
@@ -14,7 +14,7 @@ class ActionPlannerAgent:
         triage: TriageResult,
         root_cause: RootCauseResult,
         mock_mode: bool = True,
-        llm_backend: LangChainBackend | None = None,
+        llm_backend: HuggingFaceBackend | None = None,
     ) -> list[RecommendedAction]:
         if not mock_mode:
             return self._run_langchain(
@@ -83,9 +83,9 @@ class ActionPlannerAgent:
         facts: IncidentFacts,
         triage: TriageResult,
         root_cause: RootCauseResult,
-        llm_backend: LangChainBackend | None,
+        llm_backend: HuggingFaceBackend | None,
     ) -> list[RecommendedAction]:
-        backend = llm_backend or LangChainBackend()
+        backend = llm_backend or HuggingFaceBackend()
         result = backend.invoke_structured(
             system_prompt=ACTION_PLANNER_PROMPT,
             user_payload={

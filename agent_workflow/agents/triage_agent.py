@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..langchain_backend import LangChainBackend
+from ..hf_backend import HuggingFaceBackend
 from ..prompts.triage import TRIAGE_PROMPT
 from ..schemas import IncidentFacts, TriageResult
 
@@ -12,7 +12,7 @@ class TriageAgent:
         self,
         facts: IncidentFacts,
         mock_mode: bool = True,
-        llm_backend: LangChainBackend | None = None,
+        llm_backend: HuggingFaceBackend | None = None,
     ) -> TriageResult:
         if not mock_mode:
             return self._run_langchain(facts=facts, llm_backend=llm_backend)
@@ -69,9 +69,9 @@ class TriageAgent:
         self,
         *,
         facts: IncidentFacts,
-        llm_backend: LangChainBackend | None,
+        llm_backend: HuggingFaceBackend | None,
     ) -> TriageResult:
-        backend = llm_backend or LangChainBackend()
+        backend = llm_backend or HuggingFaceBackend()
         return backend.invoke_structured(
             system_prompt=TRIAGE_PROMPT,
             user_payload={"facts": facts.model_dump()},

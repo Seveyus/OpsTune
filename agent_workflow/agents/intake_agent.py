@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import re
 
-from ..langchain_backend import LangChainBackend
+from ..hf_backend import HuggingFaceBackend
 from ..prompts.intake import INTAKE_PROMPT
 from ..schemas import IncidentFacts
 
@@ -54,7 +54,7 @@ class IntakeAgent:
         self,
         incident_report: str,
         mock_mode: bool = True,
-        llm_backend: LangChainBackend | None = None,
+        llm_backend: HuggingFaceBackend | None = None,
     ) -> IncidentFacts:
         if not mock_mode:
             return self._run_langchain(incident_report=incident_report, llm_backend=llm_backend)
@@ -92,9 +92,9 @@ class IntakeAgent:
         self,
         *,
         incident_report: str,
-        llm_backend: LangChainBackend | None,
+        llm_backend: HuggingFaceBackend | None,
     ) -> IncidentFacts:
-        backend = llm_backend or LangChainBackend()
+        backend = llm_backend or HuggingFaceBackend()
         return backend.invoke_structured(
             system_prompt=INTAKE_PROMPT,
             user_payload={"incident_report": incident_report},

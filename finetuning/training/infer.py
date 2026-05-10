@@ -62,13 +62,13 @@ def main() -> int:
         print(f"[infer] loading merged weights from {load_path}")
         tokenizer = AutoTokenizer.from_pretrained(load_path, use_fast=True)
         model = AutoModelForCausalLM.from_pretrained(
-            load_path, torch_dtype=torch.bfloat16, device_map="auto",
+            load_path, dtype=torch.bfloat16, device_map="auto",
         )
     else:
         from peft import PeftModel
         tokenizer = AutoTokenizer.from_pretrained(str(cfg.ADAPTER_DIR), use_fast=True)
         base = AutoModelForCausalLM.from_pretrained(
-            cfg.BASE_MODEL_ID, torch_dtype=torch.bfloat16, device_map="auto",
+            cfg.BASE_MODEL_ID, dtype=torch.bfloat16, device_map="auto",
         )
         model = PeftModel.from_pretrained(base, str(cfg.ADAPTER_DIR))
 

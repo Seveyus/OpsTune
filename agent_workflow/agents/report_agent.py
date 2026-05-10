@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..langchain_backend import LangChainBackend
+from ..hf_backend import HuggingFaceBackend
 from ..prompts.report import REPORT_PROMPT
 from ..schemas import IncidentFacts, RecommendedAction, RootCauseResult, TriageResult, WorkflowResult
 
@@ -15,7 +15,7 @@ class ReportAgent:
         root_cause: RootCauseResult,
         actions: list[RecommendedAction],
         mock_mode: bool = True,
-        llm_backend: LangChainBackend | None = None,
+        llm_backend: HuggingFaceBackend | None = None,
     ) -> WorkflowResult:
         if not mock_mode:
             return self._run_langchain(
@@ -70,9 +70,9 @@ class ReportAgent:
         triage: TriageResult,
         root_cause: RootCauseResult,
         actions: list[RecommendedAction],
-        llm_backend: LangChainBackend | None,
+        llm_backend: HuggingFaceBackend | None,
     ) -> WorkflowResult:
-        backend = llm_backend or LangChainBackend()
+        backend = llm_backend or HuggingFaceBackend()
         return backend.invoke_structured(
             system_prompt=REPORT_PROMPT,
             user_payload={

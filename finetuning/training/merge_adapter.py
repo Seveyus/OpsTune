@@ -32,7 +32,7 @@ def main() -> int:
     print(f"[merge] target:  {cfg.MERGED_DIR}")
 
     base = AutoModelForCausalLM.from_pretrained(
-        cfg.BASE_MODEL_ID, torch_dtype=torch.bfloat16, device_map="auto",
+        cfg.BASE_MODEL_ID, dtype=torch.bfloat16, device_map="auto",
     )
     model = PeftModel.from_pretrained(base, str(cfg.ADAPTER_DIR))
     merged = model.merge_and_unload()

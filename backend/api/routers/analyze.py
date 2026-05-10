@@ -1,8 +1,13 @@
 from fastapi import APIRouter, Body
 from pydantic import BaseModel, ConfigDict
+import sys
+from pathlib import Path
+
+# Add parent directory to path to import agent_workflow
+sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
 from agent_workflow.workflow import run_workflow
-from agent_workflow.langchain_backend import LangChainBackend
+from agent_workflow.hf_backend import HuggingFaceBackend
 
 router = APIRouter(prefix="/analyze", tags=["analyze"])
 
@@ -30,7 +35,7 @@ async def analyze_incident(request: AnalyzeRequest = Body(...)):
     llm_backend = None
 
     if request.use_llm and not request.mock_mode:
-        llm_backend = LangChainBackend()
+        llm_backend = HuggingFaceBackend()
 
     result = run_workflow(
         incident_report=request.incident_report,

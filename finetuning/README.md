@@ -10,12 +10,12 @@ LoRA training on Llama 3.1 8B Instruct → vLLM serving.
 | 2 — Operator narratives | `generate_reports.py` (this dir) | ✓ |
 | 3 — Train/val/test split | `split_dataset.py` (this dir) | ✓ |
 | 4 — Baseline eval | `eval/baseline_eval.ipynb` | ✓ |
-| 5 — LoRA fine-tuning | `training/` (runs on AMD MI300X) | scripts ready |
+| 5 — LoRA fine-tuning | `training/` (runs on local GPU) | ✓ |
 | 6 — Fine-tuned eval + comparison | `eval/baseline_eval.ipynb` (re-run) + `training/compare_runs.py` | scripts ready |
-| 7 — vLLM serving | `training/serve_vllm.sh` | scripts ready |
+| 7 — Inference serving | `training/serve_simple.py` or `serve_vllm.sh` | ✓ |
 
-Stages 5-7 run on the GPU box (AMD Developer Cloud MI300X). See
-[`training/README.md`](training/README.md) for the full GPU-side runbook.
+Stages 5-7 have been successfully completed on Qwen2.5-3B-Instruct. See
+[`training/README.md`](training/README.md) for the full training runbook.
 
 ## Files
 

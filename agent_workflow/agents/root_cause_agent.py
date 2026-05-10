@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..langchain_backend import LangChainBackend
+from ..hf_backend import HuggingFaceBackend
 from ..prompts.root_cause import ROOT_CAUSE_PROMPT
 from ..schemas import IncidentFacts, RootCauseHypothesis, RootCauseResult, TriageResult
 
@@ -13,7 +13,7 @@ class RootCauseAgent:
         facts: IncidentFacts,
         triage: TriageResult,
         mock_mode: bool = True,
-        llm_backend: LangChainBackend | None = None,
+        llm_backend: HuggingFaceBackend | None = None,
     ) -> RootCauseResult:
         if not mock_mode:
             return self._run_langchain(facts=facts, triage=triage, llm_backend=llm_backend)
@@ -77,9 +77,9 @@ class RootCauseAgent:
         *,
         facts: IncidentFacts,
         triage: TriageResult,
-        llm_backend: LangChainBackend | None,
+        llm_backend: HuggingFaceBackend | None,
     ) -> RootCauseResult:
-        backend = llm_backend or LangChainBackend()
+        backend = llm_backend or HuggingFaceBackend()
         return backend.invoke_structured(
             system_prompt=ROOT_CAUSE_PROMPT,
             user_payload={
