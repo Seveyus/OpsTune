@@ -6,53 +6,93 @@
   <title>OpsTune Demo</title>
   <style>
     :root {
-      --bg: #f5f7fa;
-      --panel: #fff;
-      --ink: #17202a;
-      --muted: #627080;
-      --line: #dbe2ea;
-      --accent: #0f766e;
-      --danger: #b42318;
-      --warn: #b45309;
-      --ok: #15803d;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #0a0e1a;
+      --panel: #151b2d;
+      --ink: #ffffff;
+      --muted: #8b92a7;
+      --line: #2a3348;
+      --accent: #ed1c24;
+      --accent-glow: rgba(237, 28, 36, 0.3);
+      --danger: #ff4444;
+      --warn: #ffa500;
+      --ok: #00d084;
+      --amd-red: #ed1c24;
+      --amd-gradient: linear-gradient(135deg, #ed1c24 0%, #c41e3a 100%);
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     }
 
     * { box-sizing: border-box; }
-    body { margin: 0; background: var(--bg); color: var(--ink); }
-    main { width: min(1120px, calc(100vw - 32px)); margin: 0 auto; padding: 28px 0 40px; }
-    header { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background:
+        radial-gradient(circle at 20% 50%, rgba(237, 28, 36, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(237, 28, 36, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(237, 28, 36, 0.04) 0%, transparent 50%);
+      animation: background-pulse 15s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes background-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+
+    main { width: min(1120px, calc(100vw - 32px)); margin: 0 auto; padding: 28px 0 40px; position: relative; z-index: 1; }
+    header { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
     h1, h2, h3, p { margin: 0; }
-    h1 { font-size: 32px; letter-spacing: 0; }
+    h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #ff3b47;
+      text-shadow: 0 0 30px rgba(237, 28, 36, 0.5), 0 0 60px rgba(237, 28, 36, 0.3);
+      letter-spacing: -0.5px;
+    }
+    .brand-tag { display: inline-block; background: var(--amd-red); color: white; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 4px; margin-left: 12px; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 2px 8px rgba(237, 28, 36, 0.4); }
     header p, .hint, .source { color: var(--muted); font-size: 13px; }
-    header p { margin-top: 6px; font-size: 15px; }
-    .status { border: 1px solid var(--line); border-radius: 999px; background: var(--panel); color: var(--muted); padding: 8px 12px; white-space: nowrap; }
-    .grid { display: grid; grid-template-columns: minmax(320px, .9fr) minmax(360px, 1.1fr); gap: 18px; align-items: start; }
-    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 18px; box-shadow: 0 10px 30px rgba(23, 32, 42, .06); }
+    header p { margin-top: 8px; font-size: 15px; }
+    .status { border: 1px solid var(--line); border-radius: 999px; background: rgba(237, 28, 36, 0.1); color: var(--amd-red); padding: 8px 16px; white-space: nowrap; font-weight: 600; box-shadow: 0 0 20px var(--accent-glow); }
+    .grid { display: grid; grid-template-columns: minmax(320px, .9fr) minmax(360px, 1.1fr); gap: 20px; align-items: start; }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
     .samples { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-    button { border: 0; border-radius: 8px; font: inherit; cursor: pointer; }
-    .sample { background: #eef4f8; color: #273545; padding: 7px 10px; font-size: 13px; }
-    .sample:hover, .sample:focus-visible { outline: 2px solid #bfd1de; }
-    label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; }
-    textarea { width: 100%; min-height: 300px; resize: vertical; border: 1px solid var(--line); border-radius: 8px; padding: 14px; background: #fbfcfd; color: var(--ink); font: 15px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-    textarea:focus { outline: 3px solid rgba(15, 118, 110, .18); border-color: var(--accent); }
+    button { border: 0; border-radius: 8px; font: inherit; cursor: pointer; transition: all 0.2s ease; }
+    .sample { background: rgba(237, 28, 36, 0.08); color: var(--ink); border: 1px solid var(--line); padding: 7px 12px; font-size: 13px; }
+    .sample:hover, .sample:focus-visible { background: rgba(237, 28, 36, 0.15); border-color: var(--amd-red); transform: translateY(-1px); }
+    label { display: block; margin-bottom: 8px; color: var(--muted); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+    textarea { width: 100%; min-height: 300px; resize: vertical; border: 1px solid var(--line); border-radius: 8px; padding: 14px; background: rgba(0, 0, 0, 0.2); color: var(--ink); font: 15px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    textarea:focus { outline: 2px solid var(--amd-red); border-color: var(--amd-red); box-shadow: 0 0 0 3px var(--accent-glow); }
     .actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
-    .analyze { min-width: 132px; background: var(--accent); color: white; padding: 11px 18px; font-weight: 750; }
-    .analyze:disabled { cursor: wait; opacity: .7; }
+    .analyze { min-width: 140px; background: var(--amd-gradient); color: white; padding: 12px 24px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 16px var(--accent-glow); }
+    .analyze:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px var(--accent-glow); }
+    .analyze:disabled { cursor: wait; opacity: .6; }
     .result-top { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 16px; }
-    .source { text-align: right; }
-    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-bottom: 16px; }
-    .metric { border: 1px solid var(--line); border-radius: 8px; padding: 11px; background: #fbfcfd; min-width: 0; }
-    .metric span, .section h3 { display: block; color: var(--muted); font-size: 12px; margin-bottom: 5px; text-transform: uppercase; }
-    .metric strong { display: block; overflow-wrap: anywhere; font-size: 18px; text-transform: capitalize; }
+    .source { text-align: right; font-size: 12px; color: var(--amd-red); font-weight: 600; }
+    .metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .metric { border: 1px solid var(--line); border-radius: 8px; padding: 14px; background: rgba(0, 0, 0, 0.3); min-width: 0; }
+    .metric span, .section h3 { display: block; color: var(--muted); font-size: 11px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700; }
+    .metric strong { display: block; overflow-wrap: anywhere; font-size: 20px; font-weight: 700; text-transform: capitalize; }
     .severity-critical, .severity-high { color: var(--danger); }
     .severity-medium { color: var(--warn); }
     .severity-low { color: var(--ok); }
-    .report { border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0; background: #eefaf8; padding: 12px 14px; line-height: 1.55; margin-bottom: 16px; }
-    .sections { display: grid; gap: 14px; }
+    .report { border-left: 4px solid var(--amd-red); border-radius: 0 8px 8px 0; background: rgba(237, 28, 36, 0.08); padding: 14px 16px; line-height: 1.6; margin-bottom: 16px; }
+    .sections { display: grid; gap: 16px; }
     ul { margin: 0; padding-left: 20px; }
-    li { margin: 6px 0; line-height: 1.45; }
-    .empty { display: grid; place-items: center; min-height: 420px; border: 1px dashed var(--line); border-radius: 8px; background: #fbfcfd; color: var(--muted); text-align: center; padding: 28px; }
+    li { margin: 8px 0; line-height: 1.5; }
+    .empty { display: grid; place-items: center; min-height: 420px; border: 1px dashed var(--line); border-radius: 8px; background: rgba(0, 0, 0, 0.2); color: var(--muted); text-align: center; padding: 28px; }
     .error { color: var(--danger); }
 
     @media (max-width: 820px) {
@@ -62,16 +102,37 @@
       textarea { min-height: 240px; }
       .source { text-align: left; }
     }
+
+    /* AMD-inspired animations */
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px var(--accent-glow); }
+      50% { box-shadow: 0 0 30px var(--accent-glow), 0 0 40px var(--accent-glow); }
+    }
+
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .status.analyzing { animation: pulse-glow 2s ease-in-out infinite; }
+    .panel { animation: slide-in 0.4s ease-out; }
+    .metric { transition: all 0.3s ease; }
+    .metric:hover { transform: translateY(-2px); background: rgba(237, 28, 36, 0.05); }
+
+    /* Footer AMD branding */
+    footer { text-align: center; padding: 32px 0; color: var(--muted); font-size: 13px; }
+    footer strong { color: var(--amd-red); font-weight: 700; }
+    .tech-badge { display: inline-block; margin: 0 4px; padding: 4px 8px; background: rgba(237, 28, 36, 0.1); border: 1px solid var(--line); border-radius: 4px; font-size: 11px; font-family: monospace; }
   </style>
 </head>
 <body>
   <main>
     <header>
       <div>
-        <h1>OpsTune Incident Analysis</h1>
-        <p>Paste an incident report, run analysis, and review the structured output.</p>
+        <h1>OpsTune<span class="brand-tag">AMD AI Hackathon</span></h1>
+        <p>AI-Powered Industrial Incident Analysis • Fine-tuned on AMD Instinct MI300X</p>
       </div>
-      <div class="status" id="status">Ready</div>
+      <div class="status" id="status">🚀 Ready</div>
     </header>
 
     <div class="grid">
@@ -99,6 +160,19 @@
         <div id="result" class="empty">Select a sample or paste an incident report.</div>
       </section>
     </div>
+
+    <footer>
+      <div style="margin-bottom: 12px;">
+        <strong>Powered by AMD Instinct MI300X</strong> • Built for AMD AI Hackathon 2026
+      </div>
+      <div>
+        <span class="tech-badge">Qwen2.5-3B-Instruct</span>
+        <span class="tech-badge">LoRA Fine-tuning</span>
+        <span class="tech-badge">ROCm</span>
+        <span class="tech-badge">PyTorch</span>
+        <span class="tech-badge">FastAPI</span>
+      </div>
+    </footer>
   </main>
 
   <script>
@@ -150,14 +224,18 @@
     }
 
     function normalize(data) {
+      // Handle both response formats
+      const rootCauses = data.likely_root_causes || data.root_causes || [];
+      const actions = data.recommended_actions || [];
+
       return {
         severity: data.severity || "unknown",
         category: data.category || "unknown",
         confidence: typeof data.confidence === "number" ? data.confidence : 0,
         final_report: data.final_report || "No final report returned.",
-        root_causes: list(data.root_causes || data.likely_root_causes),
+        root_causes: list(rootCauses),
         evidence: list(data.evidence),
-        recommended_actions: list(data.recommended_actions)
+        recommended_actions: list(actions)
       };
     }
 
@@ -197,9 +275,10 @@
       const useLLM = document.querySelector("#useLLM").checked;
 
       analyze.disabled = true;
-      analyze.textContent = useLLM ? "Running LLM..." : "Analyzing...";
+      analyze.textContent = useLLM ? "🔥 Running LLM..." : "⚡ Analyzing...";
       source.textContent = useLLM ? "Calling LLM via API" : "Calling API";
-      status.textContent = "Analyzing";
+      status.textContent = "⚙️ Analyzing";
+      status.classList.add("analyzing");
 
       try {
         const response = await fetch(apiUrl(), {
@@ -211,15 +290,23 @@
             use_llm: useLLM
           })
         });
-        if (!response.ok) throw new Error(`API returned ${response.status}`);
-        render(await response.json(), useLLM ? "LLM Response (port 8000)" : "Mock Data Response");
-        status.textContent = useLLM ? "LLM completed" : "API connected";
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("API Error:", response.status, errorText);
+          throw new Error(`API returned ${response.status}: ${errorText}`);
+        }
+        const jsonResponse = await response.json();
+        console.log("API Response:", jsonResponse);
+        render(jsonResponse, useLLM ? "✅ LLM Response (AMD Fine-tuned Model)" : "📊 Mock Data Response");
+        status.textContent = useLLM ? "✅ LLM Analysis Complete" : "✅ API Connected";
       } catch (err) {
-        render(fallback, "Fallback demo mode");
-        status.textContent = "Fallback mode - " + err.message;
+        console.error("Analysis Error:", err);
+        render(fallback, "⚠️ Fallback demo mode");
+        status.textContent = "⚠️ Fallback: " + err.message;
       } finally {
         analyze.disabled = false;
         analyze.textContent = "Analyze";
+        status.classList.remove("analyzing");
       }
     }
 

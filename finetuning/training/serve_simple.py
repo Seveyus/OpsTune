@@ -125,7 +125,7 @@ async def chat_completions(request: ChatCompletionRequest):
     inputs = tokenizer(prompt, return_tensors="pt", truncation=True, max_length=2048)
     inputs = {k: v.to(model.device) for k, v in inputs.items()}
 
-    # Generate
+    # Generate with optimized parameters
     with torch.inference_mode():
         outputs = model.generate(
             **inputs,
@@ -133,6 +133,9 @@ async def chat_completions(request: ChatCompletionRequest):
             temperature=request.temperature,
             do_sample=request.temperature > 0,
             pad_token_id=tokenizer.eos_token_id,
+            repetition_penalty=1.1,  # Reduce repetition
+            top_p=0.9,  # Nucleus sampling for better quality
+            top_k=50,  # Limit vocabulary for faster generation
         )
 
     # Decode
